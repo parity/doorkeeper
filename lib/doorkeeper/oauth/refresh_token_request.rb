@@ -37,7 +37,7 @@ module Doorkeeper
           raise Errors::InvalidTokenReuse if refresh_token.revoked?
 
           refresh_token.revoke unless refresh_token_revoked_on_use?
-          create_access_token
+          find_or_create_access_token
         end
       end
       
@@ -50,7 +50,10 @@ module Doorkeeper
         refresh_token.scopes
       end
 
-      def create_access_token
+      def find_or_create_access_token
+        @access_token = AccessToken.find_by(previous_refresh_token: access_token_attributes[:previous_refresh_token])
+        #check if exisiting token is expired
+        return @access_token if @access_token.present? and !@access_token.expired?
         @access_token = AccessToken.create!(access_token_attributes)
       end
       
