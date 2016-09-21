@@ -51,7 +51,7 @@ module Doorkeeper
       end
 
       def find_or_create_access_token
-        @access_token = AccessToken.find_by(previous_refresh_token: access_token_attributes[:previous_refresh_token])
+        @access_token = AccessToken.where(previous_refresh_token: access_token_attributes[:previous_refresh_token]).last
         #check if exisiting token is expired
         return @access_token if @access_token.present? and !@access_token.expired?
         @access_token = AccessToken.create!(access_token_attributes)
